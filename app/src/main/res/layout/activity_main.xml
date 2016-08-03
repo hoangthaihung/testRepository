@@ -5,15 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="example.android.com.surfaceviewdemo.MainActivity" >
+    tools:context="example.android.com.surfaceviewdemo.MainActivity">
 
     <TextView
+        android:id="@+id/durA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        <!--android:autoLink="web"
-        android:text="http://android-er.blogspot.com/"
-        android:textStyle="bold"--> />
+        android:text="Duration: " />
+
+    <TextView
+        android:id="@+id/durB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: " />
+
+    <TextView
+        android:id="@+id/durFillBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: " />
+
+    <TextView
+        android:id="@+id/durDrawBM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: " />
+
+    <TextView
+        android:id="@+id/durTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration: " />
 
     <example.android.com.surfaceviewdemo.MySurfaceView
         android:layout_width="match_parent"

@@ -14,38 +14,37 @@ import android.view.SurfaceView;
  */
 public class MySurfaceView extends SurfaceView {
     private SurfaceHolder surfaceHolder;
-    private Bitmap bmpIcon;
     private MyThread myThread;
-    int xPos = 0;
-    int yPos = 0;
-    int deltaX = 5;
-    int deltaY = 5;
-    int iconWidth;
-    int iconHeight;
+    MainActivity mainActivity;
+
+    long timeStart;
+    long timeA;
+    long timeB;
+    long timeFillBackground;
+    long timeDrawBitmap;
+    long timeTotal;
+    long numberOfPt;
 
     public MySurfaceView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public MySurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public MySurfaceView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context _context) {
+        mainActivity = (MainActivity) _context;
+        numberOfPt = 0;
         myThread = new MyThread(this);
         surfaceHolder = getHolder();
-        bmpIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-
-        iconWidth = bmpIcon.getWidth();
-        iconHeight = bmpIcon.getHeight();
-
         surfaceHolder.addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
@@ -74,33 +73,69 @@ public class MySurfaceView extends SurfaceView {
         });
     }
 
+    private Bitmap prepareBitmap_A(int w, int h, long count) {
+        int[] data = new int[w * h];
+        // fill with dummy data
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                if (count >= 0) {
+                    data[x + y * w] = 0xFFff0000;
+                    count--;
+                } else {
+                    data[x + y * w] = 0xFFa0a0a0;
+                }
+            }
+
+        timeA = System.currentTimeMillis();
+        Bitmap bm = Bitmap.createBitmap(data, w, h, Bitmap.Config.ARGB_8888);
+        timeB = System.currentTimeMillis();
+        return bm;
+    }
+
+    private Bitmap prepareBitmap_B(int w, int h, int count) {
+        Bitmap bm = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        timeA = System.currentTimeMillis();
+
+        // fill with dummy data
+        for (int x = 0; x < w; x++)
+            for (int y = 0; y < h; y++) {
+                if (count >= 0) {
+                    bm.setPixel(x, y, 0xFFff0000);
+                    count--;
+                } else {
+                    bm.setPixel(x, y, 0xFFa0a0a0);
+                }
+            }
+
+        timeB = System.currentTimeMillis();
+        return bm;
+    }
+
     protected void drawSomething(Canvas canvas) {
-        //canvas.drawColor(Color.BLACK);
-        canvas.drawBitmap(bmpIcon, getWidth() / 2, getHeight() / 2, null);
-        xPos += deltaX;
-        if (deltaX > 0) {
-            if (xPos >= getWidth() - iconWidth) {
-                deltaX *= -1;
-            }
-        } else {
-            if (xPos <= 0) {
-                deltaX *= -1;
-            }
+        numberOfPt += 500;
+        if (numberOfPt > (long) (getWidth() * getHeight())) {
+            numberOfPt = 0;
         }
 
-        yPos += deltaY;
-        if (deltaY > 0) {
-            if (yPos >= getHeight() - iconHeight) {
-                deltaY *= -1;
-            }
-        } else {
-            if (yPos <= 0) {
-                deltaY *= -1;
-            }
-        }
-
+        timeStart = System.currentTimeMillis();
+        Bitmap bmDummy = prepareBitmap_A(getWidth(), getHeight(), numberOfPt);
         canvas.drawColor(Color.BLACK);
-        canvas.drawBitmap(bmpIcon, xPos, yPos, null);
+        timeFillBackground = System.currentTimeMillis();
+        canvas.drawBitmap(bmDummy, 0, 0, null);
+        timeDrawBitmap = System.currentTimeMillis();
+
+        mainActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mainActivity.showDuration(
+                        timeA - timeStart,
+                        timeB - timeA,
+                        timeFillBackground - timeB,
+                        timeDrawBitmap - timeFillBackground,
+                        timeDrawBitmap - timeStart
+                );
+            }
+        });
 
     }
 }
