@@ -64,7 +64,7 @@ public class MySurfaceView extends SurfaceView {
                 myThread.setRunning(false);
                 while (retry) {
                     try {
-                        myThread.join();
+                        myThread.join(); // main (UI) thread, want to wait for myThread finishing
                         retry = false;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
